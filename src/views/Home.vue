@@ -263,15 +263,15 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
           </div>
         </div>
       </div>
-      <div class="sm:container sm:mx-auto">
-        <p class="aloha text-center text-4xl sm:pt-16">
+      <div class="sm:container sm:mx-auto pt-16">
+        <p class="aloha text-center text-4xl ">
           Notas
         </p>
         <div class="divider"></div>
         <div class="window rounded-lg shadow-xl bg-base-300 w-full p-4">
           <div class="flex flex-col sm:flex-row items-center justify-between mb-4">
             <h2 class="text-lg font-bold">Notes</h2>
-            <button class="btn btn-sm btn-primary" @click="addNote">Add Note</button>
+            <button class="btn btn-sm btn-primary hidden md:flex" @click="addNote">Add Note</button>
           </div>
           <input v-model="newNote.title"
             :class="['input input-note input-bordered mb-4 w-full', newNote.color && `bg-${newNote.color}`]"
@@ -283,6 +283,9 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
             <div v-for="(color, index) in noteColors" :key="index"
               :class="`w-12 h-12 rounded cursor-pointer bg-${color}`" @click="setNoteColor(color)">
             </div>
+          </div>
+          <div class="flex justify-center py-4">
+            <button class="btn btn-sm btn-primary md:hidden" @click="addNote">Add Note</button>
           </div>
         </div>
         <div class="window p-8">
