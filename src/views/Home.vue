@@ -92,7 +92,7 @@ const addItemFromTap = async (itemToAdd) => {
   const productosCollection = collection(db, "productos");
   try {
     loadingProducts.value = true;
-    updateDoc(doc(productosCollection, itemToAdd.id), {
+    await updateDoc(doc(productosCollection, itemToAdd.id), {
       ...itemToAdd,
       comprado: false,
     });
@@ -108,7 +108,7 @@ const removeItem = async (itemToRemove) => {
   const productosCollection = collection(db, "productos");
   try {
     loadingProducts.value = true;
-    updateDoc(doc(productosCollection, itemToRemove.id), {
+    await updateDoc(doc(productosCollection, itemToRemove.id), {
       ...itemToRemove,
       comprado: true,
     });
@@ -236,7 +236,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
                 </template>
                 <template v-else>
                   <input class="input input-bordered w-full" placeholder="Buscar" v-model="buscarAgregados" />
-                  <p class="text-center text-green-600 text-2xl" v-for="(itemAdded, index) in agregadosFiltered"
+                  <p class="text-center text-green-600 text-2xl cursor-pointer" v-for="(itemAdded, index) in agregadosFiltered"
                     :key="`a-${index}`" @click="removeItem(itemAdded)">{{ itemAdded.nombre }}</p>
                 </template>
               </div>
@@ -255,7 +255,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
                 </template>
                 <template v-else>
                   <input class="input input-bordered w-full" placeholder="Buscar" v-model="buscarComprados" />
-                  <p class="text-center text-red-600 text-2xl" v-for="(itemRemoved, index) in compradosFiltered"
+                  <p class="text-center text-red-600 text-2xl cursor-pointer" v-for="(itemRemoved, index) in compradosFiltered"
                     :key="`r-${index}`" @click="addItemFromTap(itemRemoved)">{{ itemRemoved.nombre }}</p>
                 </template>
               </div>
