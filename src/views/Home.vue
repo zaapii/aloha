@@ -193,11 +193,19 @@ const setNoteColor = (color) => {
   newNote.value.color = color;
 };
 
-const noteColors = ['primary', 'secondary', 'warning'];
+const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info', 'accent'];
 
 </script>
 
 <template>
+  <div class="bg-primary hidden">sarasa</div>
+  <div class="bg-info hidden">sarasa</div>
+  <div class="bg-warning hidden">sarasa</div>
+  <div class="bg-error hidden">sarasa</div>
+  <div class="bg-success hidden">sarasa</div>
+  <div class="bg-secondary hidden">sarasa</div>
+  <div class="bg-accent hidden">sarasa</div>
+
   <div class="flex justify-center">
     <div class="flex flex-col w-full md:w-3/4 p-8 md:p-16">
       <div class="title">
