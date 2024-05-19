@@ -1,8 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, toRaw } from 'vue';
+import { db } from '../../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 // Declare the ref for items
 const items = ref([]);
+const loading = ref(false);
 const date = ref('');
 
 // Function to clear all items
@@ -18,16 +21,15 @@ const handleFileUpload = (event) => {
     reader.onload = (e) => {
       try {
         const jsonData = JSON.parse(e.target.result);
-        date.value = jsonData[0].createdDateTime.split('T')[0];
+        date.value = new Date().toLocaleDateString();
         // Map JSON data to the desired structure
         items.value = jsonData.map((item) => ({
           id: item.id,
-          price: item.priceInfo.itemPrice.value,
-          description: item.product.name,
-          thumbnailUrl: item.product.imageInfo.thumbnailUrl,
-          isVegan: item.product.isVegan,
+          price: item.priceInfo?.itemPrice?.value || item.priceInfo?.linePrice?.value,
+          description: item.product?.name || item.productInfo.name,
+          thumbnailUrl: item.product?.imageInfo?.thumbnailUrl || item.productInfo.imageInfo.thumbnailUrl,
+          isVegan: true,
         }));
-        console.log('Extracted Items:', items.value);
       } catch (error) {
         console.error('Error parsing JSON:', error);
       }
@@ -38,9 +40,54 @@ const handleFileUpload = (event) => {
   }
 };
 
+
+const setIsVegan = (e, id) => {
+  const item = items.value.find((item) => item.id === id);
+  item.isVegan = e.target.checked;
+};
+
+const uploadBuy = async () => {
+  loading.value = true;
+  // Convert items to raw data
+  const itemsRaw = toRaw(items.value)
+  
+  const order = {
+    fecha: date.value,
+    productos: itemsRaw,
+    total: total.value,
+    totalPame: totalPame.value,
+    totalGene: totalGene.value,
+  }
+  
+  try {
+    const comprasCollection = collection(db, "compras")
+    await addDoc(comprasCollection, order)
+    clearAll()
+    console.log('Buy uploaded successfully:', order)
+  } catch (error) {
+    console.error('Error uploading buy:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
 // Computed property to calculate the total price
 const total = computed(() => {
   return items.value.reduce((total, item) => total + item.price, 0);
+});
+
+const totalNotVegan = computed(() => {
+  return items.value.reduce((total, item) => {
+    return item.isVegan ? total : total + item.price;
+  }, 0);
+});
+
+const totalPame = computed(() => {
+  return (total.value - totalNotVegan.value) / 4
+});
+
+const totalGene = computed(() => {
+  return (total.value) / 4
 });
 </script>
 
@@ -70,10 +117,7 @@ const total = computed(() => {
           </td>
           <td>{{ item.description }}</td>
           <td>
-            <div v-if="item.isVegan">
-              <img src="https://seeklogo.com/images/V/vegan-logo-ACE43D0D9E-seeklogo.com.png" alt="Vegan Logo"
-                class="w-10 h-10">
-            </div>
+            <input type="checkbox" :checked="item.isVegan" class="checkbox checkbox-lg checkbox-secondary" @change="setIsVegan($event, item.id)" />
           </td>
           <td class="text-secondary font-bold">$ {{ item.price }}</td>
         </tr>
@@ -87,7 +131,7 @@ const total = computed(() => {
     </table>
     <div class="flex w-full gap-2 justify-center">
       <button @click="clearAll" class="btn btn-primary mt-8">Clear Items</button>
-      <button @click="uploadBuy" class="btn btn-secondary mt-8">uploadBuy</button>
+      <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Upload</button>
     </div>
   </div>
 </template>
