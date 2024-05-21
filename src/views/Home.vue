@@ -311,7 +311,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
       </p>
       <div class="divider"></div>
 
-      <div class="card w-full bg-base-100 shadow-xl border border-secondary" v-for="compra in compras" :key="compra.id">
+      <div class="card w-full bg-base-100 shadow-xl border border-secondary my-4" v-for="compra in compras" :key="compra.id">
         <div class="card-body">
           <h2 class="card-title text-2xl font-bold mb-4">Resumen de la compra</h2>
           <div class="flex items-center justify-between mb-4">
@@ -336,13 +336,6 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
             </div>
             <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
               Detalle</button>
-          </div>
-          <div class="flex flex-wrap mt-4">
-            <div v-for="(product, index) in compra.productos" :key="index" class="avatar m-2">
-              <div class="w-16 rounded">
-                <img :src="product.thumbnailUrl" :alt="product.description" />
-              </div>
-            </div>
           </div>
 
           <table class="table w-full table-zebra" v-if="compra.verDetalle">

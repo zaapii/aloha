@@ -7,10 +7,31 @@ import { collection, addDoc } from 'firebase/firestore';
 const items = ref([]);
 const loading = ref(false);
 const date = ref('');
+const price = ref(0);
+const description = ref('');
+const thumbnailUrl = ref('');
+const isVegan = ref(false);
+const customOrder = ref(false);
 
 // Function to clear all items
 const clearAll = () => {
   items.value = [];
+};
+
+// Function to add item to custom order
+const addItemToCustomOrder = () => {
+  customOrder.value = true
+  items.value.push({
+    id: customOrder.value.length + 1,
+    price: price.value,
+    description: description.value,
+    thumbnailUrl: thumbnailUrl.value,
+    isVegan: isVegan.value,
+  });
+  price.value = 0;
+  description.value = '';
+  thumbnailUrl.value = '';
+  isVegan.value = false;
 };
 
 // Function to handle file upload
@@ -50,15 +71,15 @@ const uploadBuy = async () => {
   loading.value = true;
   // Convert items to raw data
   const itemsRaw = toRaw(items.value)
-  
+
   const order = {
-    fecha: date.value,
+    fecha: date.value || new Date().toLocaleDateString(),
     productos: itemsRaw,
     total: total.value,
     totalPame: totalPame.value,
     totalGene: totalGene.value,
   }
-  
+
   try {
     const comprasCollection = collection(db, "compras")
     await addDoc(comprasCollection, order)
@@ -92,13 +113,32 @@ const totalGene = computed(() => {
 </script>
 
 <template>
-  <div class="flex justify-center pt-16" v-if="!items.length">
+  <div class="flex justify-center pt-16 flex-col items-center gap-32" v-if="!items.length || customOrder">
     <div class="flex w-3/4 md:w-1/2">
       <input type="file" @change="handleFileUpload"
         class="file-input file-input-bordered file-input-secondary w-full" />
     </div>
+
+    <div class="flex flex-col gap-8 w-1/2">
+      <div class="text-4xl text-secondary text-bold mb-4">
+        Carga de compra manual
+      </div>
+      <div class="flex w-full gap-2 justify-between">
+        <input type="text" placeholder="Descripcion" class="input input-bordered w-full flex-1" v-model="description" />
+        <input type="number" class="input input-bordered w-full max-w-xs" v-model="price" />
+      </div>
+      <input type="text" placeholder="Imagen" class="input input-bordered w-full" v-model="thumbnailUrl" />
+      <label class="label cursor-pointer w-full justify-center flex gap-4">
+        <span class="label-text">Es Vegano?</span>
+        <input type="checkbox" checked="checked" class="checkbox checkbox-secondary" v-model="isVegan" />
+      </label>
+      <div class="flex gap-2 w-full justify-between my-4">
+        <button @click="clearAll" class="btn btn-secondary">Limpiar items</button>
+        <button @click="addItemToCustomOrder" class="btn btn-primary">Agregar item a la compra</button>
+      </div>
+    </div>
   </div>
-  <div v-if="items.length" class="overflow-x-auto p-4 md:p-32">
+  <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:p-32">
     <h2 class="text-2xl font-bold text-center text-secondary">Compra hecha el {{ date }}</h2>
     <div class="divider"></div>
     <table class="table w-full table-zebra">
@@ -113,11 +153,12 @@ const totalGene = computed(() => {
       <tbody>
         <tr v-for="item in items" :key="item.id">
           <td>
-            <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover">
+            <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover" v-if="item.thumbnailUrl">
           </td>
           <td>{{ item.description }}</td>
           <td>
-            <input type="checkbox" :checked="item.isVegan" class="checkbox checkbox-lg checkbox-secondary" @change="setIsVegan($event, item.id)" />
+            <input type="checkbox" :checked="item.isVegan" :disabled="customOrder" class="checkbox checkbox-lg checkbox-secondary"
+              @change="setIsVegan($event, item.id)" />
           </td>
           <td class="text-secondary font-bold">$ {{ item.price }}</td>
         </tr>
