@@ -15,7 +15,7 @@ const customOrder = ref(false);
 
 // Function to clear all items
 const clearAll = () => {
-  window.confirm('Are you sure you want to clear all items?') && (items.value = []);
+  items.value = []
 };
 
 // Function to add item to custom order
@@ -114,13 +114,13 @@ const totalGene = computed(() => {
 </script>
 
 <template>
-  <div class="flex justify-center pt-16 flex-col items-center gap-32" v-if="!items.length || customOrder">
+  <div class="flex justify-center pt-16 flex-col items-center" v-if="!items.length || customOrder">
     <div class="flex w-3/4 md:w-1/2">
       <input type="file" @change="handleFileUpload"
         class="file-input file-input-bordered file-input-secondary w-full" />
     </div>
 
-    <div class="flex flex-col gap-8 w-full p-4 md:w-1/2">
+    <div class="flex flex-col gap-8 w-full p-4 md:w-1/2 mt-16">
       <div class="text-4xl text-secondary text-bold mb-4">
         Carga de compra manual
       </div>
@@ -133,12 +133,12 @@ const totalGene = computed(() => {
         <span class="label-text">Es Vegano?</span>
         <input type="checkbox" checked="checked" class="checkbox checkbox-secondary" v-model="isVegan" />
       </label>
-      <div class="flex flex-col md:flex-row gap-2 w-full justify-between my-4">
-        <button @click="clearAll" class="btn btn-secondary">Limpiar items</button>
+      <div class="flex w-full justify-center my-4">
         <button @click="addItemToCustomOrder" class="btn btn-primary">Agregar item a la compra</button>
       </div>
     </div>
-    <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:p-32">
+    <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:px-32 py-8 w-3/4">
+      <div class="divider"></div>
       <h2 class="text-2xl font-bold text-center text-secondary">Compra hecha el {{ date }}</h2>
       <div class="divider"></div>
       <table class="table w-full table-zebra">
@@ -170,10 +170,10 @@ const totalGene = computed(() => {
           </tr>
         </tbody>
       </table>
-      <div class="flex w-full gap-2 justify-center">
-        <button @click="clearAll" class="btn btn-primary mt-8">Clear Items</button>
-        <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Upload</button>
-      </div>
+    </div>
+    <div class="flex flex-col md:flex-row gap-2 w-full justify-center pb-8" v-if="items.length && !loading">
+      <button @click="clearAll" class="btn btn-primary mt-8">Borrar Items</button>
+      <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Subir compra</button>
     </div>
   </div>
 </template>
