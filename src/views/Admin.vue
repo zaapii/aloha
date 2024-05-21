@@ -15,11 +15,12 @@ const customOrder = ref(false);
 
 // Function to clear all items
 const clearAll = () => {
-  items.value = [];
+  window.confirm('Are you sure you want to clear all items?') && (items.value = []);
 };
 
 // Function to add item to custom order
 const addItemToCustomOrder = () => {
+  date.value = new Date().toLocaleDateString();
   customOrder.value = true
   items.value.push({
     id: customOrder.value.length + 1,
@@ -119,60 +120,60 @@ const totalGene = computed(() => {
         class="file-input file-input-bordered file-input-secondary w-full" />
     </div>
 
-    <div class="flex flex-col gap-8 w-1/2">
+    <div class="flex flex-col gap-8 w-full p-4 md:w-1/2">
       <div class="text-4xl text-secondary text-bold mb-4">
         Carga de compra manual
       </div>
       <div class="flex w-full gap-2 justify-between">
-        <input type="text" placeholder="Descripcion" class="input input-bordered w-full flex-1" v-model="description" />
-        <input type="number" class="input input-bordered w-full max-w-xs" v-model="price" />
+        <input type="text" placeholder="Descripcion" class="input input-bordered w-3/4" v-model="description" />
+        <input type="number" class="input input-bordered w-1/4" v-model="price" />
       </div>
       <input type="text" placeholder="Imagen" class="input input-bordered w-full" v-model="thumbnailUrl" />
       <label class="label cursor-pointer w-full justify-center flex gap-4">
         <span class="label-text">Es Vegano?</span>
         <input type="checkbox" checked="checked" class="checkbox checkbox-secondary" v-model="isVegan" />
       </label>
-      <div class="flex gap-2 w-full justify-between my-4">
+      <div class="flex flex-col md:flex-row gap-2 w-full justify-between my-4">
         <button @click="clearAll" class="btn btn-secondary">Limpiar items</button>
         <button @click="addItemToCustomOrder" class="btn btn-primary">Agregar item a la compra</button>
       </div>
     </div>
-  </div>
-  <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:p-32">
-    <h2 class="text-2xl font-bold text-center text-secondary">Compra hecha el {{ date }}</h2>
-    <div class="divider"></div>
-    <table class="table w-full table-zebra">
-      <thead>
-        <tr>
-          <th class="text-left">Image</th>
-          <th class="text-left">Description</th>
-          <th class="text-left">isVegan?</th>
-          <th class="text-left">Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in items" :key="item.id">
-          <td>
-            <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover" v-if="item.thumbnailUrl">
-          </td>
-          <td>{{ item.description }}</td>
-          <td>
-            <input type="checkbox" :checked="item.isVegan" :disabled="customOrder" class="checkbox checkbox-lg checkbox-secondary"
-              @change="setIsVegan($event, item.id)" />
-          </td>
-          <td class="text-secondary font-bold">$ {{ item.price }}</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td class="text-left font-bold text-lg">Total:</td>
-          <td class="text-left font-bold text-lg">$ {{ total }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="flex w-full gap-2 justify-center">
-      <button @click="clearAll" class="btn btn-primary mt-8">Clear Items</button>
-      <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Upload</button>
+    <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:p-32">
+      <h2 class="text-2xl font-bold text-center text-secondary">Compra hecha el {{ date }}</h2>
+      <div class="divider"></div>
+      <table class="table w-full table-zebra">
+        <thead>
+          <tr>
+            <th class="text-left">Image</th>
+            <th class="text-left">Description</th>
+            <th class="text-left">isVegan?</th>
+            <th class="text-left">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items" :key="item.id">
+            <td>
+              <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover" v-if="item.thumbnailUrl">
+            </td>
+            <td>{{ item.description }}</td>
+            <td>
+              <input type="checkbox" :checked="item.isVegan" :disabled="customOrder" class="checkbox checkbox-lg checkbox-secondary"
+                @change="setIsVegan($event, item.id)" />
+            </td>
+            <td class="text-secondary font-bold">$ {{ item.price }}</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td class="text-left font-bold text-lg">Total:</td>
+            <td class="text-left font-bold text-lg">$ {{ total }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="flex w-full gap-2 justify-center">
+        <button @click="clearAll" class="btn btn-primary mt-8">Clear Items</button>
+        <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Upload</button>
+      </div>
     </div>
   </div>
 </template>
