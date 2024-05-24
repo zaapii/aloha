@@ -326,7 +326,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
           </div>
           <div class="flex flex-col gap-3 md:flex-row md:gap-0 items-center justify-between mb-4">
             <div class="text-5xl text-center md:text-left">
-              <strong>Total:</strong> ${{ compra.total }}
+              <strong>Total:</strong> ${{ compra.total.toFixed(2)  }}
             </div>
             <div class="text-2xl text-secondary">
               <strong>Total Gene:</strong> ${{ compra.totalGene.toFixed(2) }}

@@ -23,7 +23,6 @@ const addItemToCustomOrder = () => {
   date.value = new Date().toLocaleDateString();
   customOrder.value = true
   items.value.push({
-    id: customOrder.value.length + 1,
     price: price.value,
     description: description.value,
     thumbnailUrl: thumbnailUrl.value,
@@ -43,15 +42,18 @@ const handleFileUpload = (event) => {
     reader.onload = (e) => {
       try {
         const jsonData = JSON.parse(e.target.result);
+        console.log('JSON data:', jsonData);
         date.value = new Date().toLocaleDateString();
         // Map JSON data to the desired structure
         items.value = jsonData.map((item) => ({
           id: item.id,
           price: item.priceInfo?.itemPrice?.value || item.priceInfo?.linePrice?.value,
-          description: item.product?.name || item.productInfo.name,
-          thumbnailUrl: item.product?.imageInfo?.thumbnailUrl || item.productInfo.imageInfo.thumbnailUrl,
+          description: item.product?.name || item.productInfo?.name,
+          thumbnailUrl: item.product?.imageInfo?.thumbnailUrl || item.productInfo?.imageInfo?.thumbnailUrl || '',
           isVegan: true,
         }));
+
+        console.log('Items:', items.value);
       } catch (error) {
         console.error('Error parsing JSON:', error);
       }
@@ -111,11 +113,16 @@ const totalPame = computed(() => {
 const totalGene = computed(() => {
   return (total.value) / 4
 });
+
+// Function to remove item
+const removeItem = (id) => {
+  items.value = items.value.filter((item) => item.id !== id);
+};
 </script>
 
 <template>
-  <div class="flex justify-center pt-16 flex-col items-center" v-if="!items.length || customOrder">
-    <div class="flex w-3/4 md:w-1/2">
+  <div class="flex justify-center pt-16 flex-col items-center">
+    <div class="flex w-3/4 md:w-1/2" v-if="!items.length || customOrder">
       <input type="file" @change="handleFileUpload"
         class="file-input file-input-bordered file-input-secondary w-full" />
     </div>
@@ -148,6 +155,7 @@ const totalGene = computed(() => {
             <th class="text-left">Description</th>
             <th class="text-left">isVegan?</th>
             <th class="text-left">Price</th>
+            <th class="text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -161,6 +169,9 @@ const totalGene = computed(() => {
                 @change="setIsVegan($event, item.id)" />
             </td>
             <td class="text-secondary font-bold">$ {{ item.price }}</td>
+            <td>
+              <button @click="removeItem(item.id)" class="btn btn-error">Remove</button>
+            </td>
           </tr>
           <tr>
             <td></td>
