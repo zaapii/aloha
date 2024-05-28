@@ -99,10 +99,12 @@ const uploadBuy = async () => {
 
   const order = {
     fecha: date.value || new Date().toLocaleDateString(),
+    comprador: comprador.value,
     productos: itemsRaw,
     total: total.value,
-    totalHuay: totalHuay.value,
-    totalGene: totalGene.value,
+    totalHuay: comprador !== 'Huay' ? totalHuay.value : 0,
+    totalGene: comprador !== 'Gene' ? totalGene.value : 0,
+    totalLarima: comprador !== 'Larima' ? totalLarima.value : 0,
   }
 
   try {
@@ -134,6 +136,10 @@ const totalHuay = computed(() => {
 
 const totalGene = computed(() => {
   return (total.value) / 4
+});
+
+const totalLarima = computed(() => {
+  return (((total.value) / 4) * 2).toFixed(2)
 });
 
 

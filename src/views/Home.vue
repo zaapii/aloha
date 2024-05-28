@@ -334,6 +334,9 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
             <div class="text-2xl text-secondary">
               <strong>Total Huay:</strong> ${{ compra.totalHuay.toFixed(2) }}
             </div>
+            <div class="text-2xl text-secondary">
+              <strong>Total Larima:</strong> ${{ compra.totalLarima.toFixed(2) }}
+            </div>
             <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
               Detalle</button>
           </div>
