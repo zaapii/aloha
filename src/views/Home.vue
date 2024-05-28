@@ -16,6 +16,10 @@ const newNote = ref({ title: '', content: '', color: 'warning' });
 const notes = ref([]);
 const notasLoading = ref(false);
 
+const comprasSortedByDate = computed(() => {
+  return compras.value.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+});
+
 const getCompras = async () => {
   loadingProducts.value = true;
   try {
@@ -148,11 +152,11 @@ const verDetalle = (id) => {
 };
 
 const agregadosFiltered = computed(() => {
-  return itemsAdded.value.filter((item) => item.nombre.toLowerCase().includes(buscarComprados.value.toLowerCase()));
+  return itemsAdded.value.filter((item) => item.nombre.toLowerCase().includes(buscarAgregados.value.toLowerCase()));
 });
 
 const compradosFiltered = computed(() => {
-  return itemsRemoved.value.filter((item) => item.nombre.toLowerCase().includes(buscarAgregados.value.toLowerCase()));
+  return itemsRemoved.value.filter((item) => item.nombre.toLowerCase().includes(buscarComprados.value.toLowerCase()));
 });
 
 const addNote = async () => {
@@ -311,7 +315,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
       </p>
       <div class="divider"></div>
 
-      <div class="card w-full bg-base-100 shadow-xl border border-secondary my-4" v-for="compra in compras" :key="compra.id">
+      <div class="card w-full bg-base-100 shadow-xl border border-secondary my-4" v-for="compra in comprasSortedByDate" :key="compra.id">
         <div class="card-body">
           <h2 class="card-title text-2xl font-bold mb-4">Resumen de la compra</h2>
           <div class="flex items-center justify-between mb-4">
@@ -329,13 +333,16 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
               <strong>Total:</strong> ${{ compra.total.toFixed(2)  }}
             </div>
             <div class="text-2xl text-secondary">
-              <strong>Total Gene:</strong> ${{ compra.totalGene.toFixed(2) }}
+              <strong>Comprado por:</strong> {{ compra.comprador ?? 'Larima' }}
             </div>
-            <div class="text-2xl text-secondary">
-              <strong>Total Huay:</strong> ${{ compra.totalHuay.toFixed(2) }}
+            <div class="text-2xl text-secondary" v-if="compra.totalGene > 0">
+              <strong>Total Gene:</strong> ${{ compra.totalGene?.toFixed(2) }}
             </div>
-            <div class="text-2xl text-secondary">
-              <strong>Total Larima:</strong> ${{ compra.totalLarima.toFixed(2) }}
+            <div class="text-2xl text-secondary" v-if="compra.totalHuay > 0">
+              <strong>Total Huay:</strong> ${{ compra.totalHuay?.toFixed(2) }}
+            </div>
+            <div class="text-2xl text-secondary" v-if="compra.totalLarima > 0" >
+              <strong>Total Larima:</strong> ${{ compra.totalLarima?.toFixed(2) }}
             </div>
             <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
               Detalle</button>

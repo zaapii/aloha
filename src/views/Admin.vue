@@ -116,6 +116,13 @@ const uploadBuy = async () => {
     console.error('Error uploading buy:', error);
   } finally {
     loading.value = false;
+
+    toast(`Compra cargada exitosamente`, {
+      autoClose: 2000,
+      position: toast.POSITION.BOTTOM_RIGHT,
+      theme: "dark",
+      type: "success"
+    });
   }
 };
 
@@ -218,7 +225,7 @@ const removeItem = (id) => {
       <div class="form-control flex gap-2" v-for="comprador in compradores" :key="comprador">
         <label class="label cursor-pointer">
           <span class="label-text">{{ comprador }}</span> 
-          <input type="radio" name="radio-10" class="radio radio-secondary" @change="setComprador" />
+          <input type="radio" name="radio-10" class="radio radio-secondary" @change="setComprador" :value="comprador" />
         </label>
       </div>
       <button @click="clearAll" class="btn btn-primary mt-8">Borrar Items</button>
