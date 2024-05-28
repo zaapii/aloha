@@ -2,6 +2,8 @@
 import { ref, computed, toRaw } from 'vue';
 import { db } from '../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { useRoute } from 'vue-router';
+import { toast } from 'vue3-toastify';
 
 // Declare the ref for items
 const items = ref([]);
@@ -12,11 +14,24 @@ const description = ref('');
 const thumbnailUrl = ref('');
 const isVegan = ref(false);
 const customOrder = ref(false);
+const comprador = ref('')
+
+const compradores = [
+  'Gene',
+  'Huay',
+  'Larima'
+]
+
+const route = useRoute();
 
 // Function to clear all items
 const clearAll = () => {
   items.value = []
 };
+
+const setComprador = (e) => {
+  comprador.value = e.target.value
+}
 
 // Function to add item to custom order
 const addItemToCustomOrder = () => {
@@ -27,6 +42,13 @@ const addItemToCustomOrder = () => {
     description: description.value,
     thumbnailUrl: thumbnailUrl.value,
     isVegan: isVegan.value,
+  });
+  
+  toast(`Agregado ${description.value} a la compra. ${isVegan.value ? 'Es vegano asi que Huay is happy' : ''}`, {
+    autoClose: 2000,
+    position: toast.POSITION.BOTTOM_RIGHT,
+    theme: "dark",
+    type: "success"
   });
   price.value = 0;
   description.value = '';
@@ -79,7 +101,7 @@ const uploadBuy = async () => {
     fecha: date.value || new Date().toLocaleDateString(),
     productos: itemsRaw,
     total: total.value,
-    totalPame: totalPame.value,
+    totalHuay: totalHuay.value,
     totalGene: totalGene.value,
   }
 
@@ -106,13 +128,15 @@ const totalNotVegan = computed(() => {
   }, 0);
 });
 
-const totalPame = computed(() => {
+const totalHuay = computed(() => {
   return (total.value - totalNotVegan.value) / 4
 });
 
 const totalGene = computed(() => {
   return (total.value) / 4
 });
+
+
 
 // Function to remove item
 const removeItem = (id) => {
@@ -121,13 +145,13 @@ const removeItem = (id) => {
 </script>
 
 <template>
-  <div class="flex justify-center pt-16 flex-col items-center">
-    <div class="flex w-3/4 md:w-1/2" v-if="!items.length || customOrder">
+  <div class="flex justify-center pt-8 flex-col items-center">
+    <div class="flex w-3/4 md:w-1/2" v-if="route.query.ima && (!items.length || customOrder)">
       <input type="file" @change="handleFileUpload"
         class="file-input file-input-bordered file-input-secondary w-full" />
     </div>
 
-    <div class="flex flex-col gap-8 w-full p-4 md:w-1/2 mt-16">
+    <div class="flex flex-col gap-8 w-full p-4 md:w-1/2">
       <div class="text-4xl text-secondary text-bold mb-4">
         Carga de compra manual
       </div>
@@ -144,14 +168,14 @@ const removeItem = (id) => {
         <button @click="addItemToCustomOrder" class="btn btn-primary">Agregar item a la compra</button>
       </div>
     </div>
-    <div v-if="items.length && !loading" class="overflow-x-auto p-4 md:px-32 py-8 w-3/4">
+    <div v-if="items.length && !loading" class="overflow-x-auto p-0 py-8 w-1/2">
       <div class="divider"></div>
       <h2 class="text-2xl font-bold text-center text-secondary">Compra hecha el {{ date }}</h2>
       <div class="divider"></div>
       <table class="table w-full table-zebra">
         <thead>
           <tr>
-            <th class="text-left">Image</th>
+            <th class="text-left hidden md:block">Image</th>
             <th class="text-left">Description</th>
             <th class="text-left">isVegan?</th>
             <th class="text-left">Price</th>
@@ -160,7 +184,7 @@ const removeItem = (id) => {
         </thead>
         <tbody>
           <tr v-for="item in items" :key="item.id">
-            <td>
+            <td class="hidden md:block">
               <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover" v-if="item.thumbnailUrl">
             </td>
             <td>{{ item.description }}</td>
@@ -168,21 +192,29 @@ const removeItem = (id) => {
               <input type="checkbox" :checked="item.isVegan" :disabled="customOrder" class="checkbox checkbox-lg checkbox-secondary"
                 @change="setIsVegan($event, item.id)" />
             </td>
-            <td class="text-secondary font-bold">$ {{ item.price }}</td>
+            <td class="text-secondary font-bold whitespace-nowrap">$ {{ item.price }}</td>
             <td>
-              <button @click="removeItem(item.id)" class="btn btn-error">Remove</button>
+              <button @click="removeItem(item.id)" class="btn btn-error btn-xs">Remove</button>
             </td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
+            <td class="hidden md:block"></td>
             <td class="text-left font-bold text-lg">Total:</td>
-            <td class="text-left font-bold text-lg">$ {{ total }}</td>
+            <td class="text-left font-bold text-lg whitespace-nowrap">$ {{ total }}</td>
+            <td></td>
+            <td></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="flex flex-col md:flex-row gap-2 w-full justify-center pb-8" v-if="items.length && !loading">
+    <div class="flex flex-col w-full justify-center pb-8 p-4 w-full md:w-1/2" v-if="items.length && !loading">
+      <div class="text-2xl text-secondary py-2">Quien compra?</div>
+      <div class="form-control flex gap-2" v-for="comprador in compradores" :key="comprador">
+        <label class="label cursor-pointer">
+          <span class="label-text">{{ comprador }}</span> 
+          <input type="radio" name="radio-10" class="radio radio-secondary" @change="setComprador" />
+        </label>
+      </div>
       <button @click="clearAll" class="btn btn-primary mt-8">Borrar Items</button>
       <button @click="uploadBuy" :loading="loading" class="btn btn-secondary mt-8">Subir compra</button>
     </div>

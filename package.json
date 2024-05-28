@@ -13,7 +13,8 @@
     "konva": "^9.3.8",
     "vue": "^3.2.47",
     "vue-konva": "^3.0.2",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "vue3-toastify": "^0.2.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",

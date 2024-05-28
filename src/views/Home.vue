@@ -332,7 +332,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
               <strong>Total Gene:</strong> ${{ compra.totalGene.toFixed(2) }}
             </div>
             <div class="text-2xl text-secondary">
-              <strong>Total Pame:</strong> ${{ compra.totalPame.toFixed(2) }}
+              <strong>Total Huay:</strong> ${{ compra.totalHuay.toFixed(2) }}
             </div>
             <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
               Detalle</button>
@@ -341,7 +341,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
           <table class="table w-full table-zebra" v-if="compra.verDetalle">
             <thead>
               <tr>
-                <th class="text-left">Image</th>
+                <th class="text-left hidden md:block">Image</th>
                 <th class="text-left">Description</th>
                 <th class="text-left">isVegan?</th>
                 <th class="text-left">Price</th>
@@ -349,7 +349,7 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
             </thead>
             <tbody>
               <tr v-for="item in compra.productos" :key="item.id">
-                <td>
+                <td class="hidden md:block">
                   <img :src="item.thumbnailUrl" alt="Product Image" class="md:w-24 md:h-24 object-cover">
                 </td>
                 <td>{{ item.description }}</td>
