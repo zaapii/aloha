@@ -146,7 +146,7 @@ const totalGene = computed(() => {
 });
 
 const totalLarima = computed(() => {
-  return (((total.value) / 4) * 2).toFixed(2)
+  return (((total.value) / 4) * 2)
 });
 
 

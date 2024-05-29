@@ -88,6 +88,18 @@ getProductos();
 getCompras();
 getNotas()
 
+const marcarSaldada = async (compraId) => {
+  const comprasCollection = collection(db, "compras");
+  try {
+    await updateDoc(doc(comprasCollection, compraId), {
+      saldada: true
+    });
+    compras.value.find(compra => compra.id === compraId).saldada = true;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
 const addItemFromTap = async (itemToAdd) => {
   if (itemsAdded.value.some(item => item.nombre === itemToAdd.nombre) || !itemToAdd.id) {
     return;
@@ -332,20 +344,31 @@ const noteColors = ['primary', 'secondary', 'warning', 'error', 'success', 'info
             <div class="text-5xl text-center md:text-left">
               <strong>Total:</strong> ${{ compra.total.toFixed(2)  }}
             </div>
-            <div class="text-2xl text-secondary">
-              <strong>Comprado por:</strong> {{ compra.comprador ?? 'Larima' }}
+            <template v-if="!compra.saldada">
+              <div class="text-2xl text-secondary">
+                <strong>Comprado por:</strong><br> {{ compra.comprador ?? 'Larima' }}
+              </div>
+              <div class="text-2xl text-secondary" v-if="compra.totalGene > 0">
+                <strong>Total Gene:</strong><br> ${{ compra.totalGene?.toFixed(2) }}
+              </div>
+              <div class="text-2xl text-secondary" v-if="compra.totalHuay > 0">
+                <strong>Total Huay:</strong><br> ${{ compra.totalHuay?.toFixed(2) }}
+              </div>
+              <div class="text-2xl text-secondary" v-if="compra.totalLarima > 0" >
+                <strong>Total Larima:</strong><br> ${{ compra.totalLarima?.toFixed(2) }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="text-2xl flex flex-col text-success">
+                <strong>Compra saldada</strong>
+                <progress class="progress progress-success w-56" value="100" max="100"></progress>
+              </div>
+            </template>
+            <div class="flex gap-2 flex-col md:flex-row">
+              <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
+                Detalle</button>
+              <button class="btn btn-success" v-if="!compra.saldada" @click="marcarSaldada(compra.id)">Marcar como saldada</button>
             </div>
-            <div class="text-2xl text-secondary" v-if="compra.totalGene > 0">
-              <strong>Total Gene:</strong> ${{ compra.totalGene?.toFixed(2) }}
-            </div>
-            <div class="text-2xl text-secondary" v-if="compra.totalHuay > 0">
-              <strong>Total Huay:</strong> ${{ compra.totalHuay?.toFixed(2) }}
-            </div>
-            <div class="text-2xl text-secondary" v-if="compra.totalLarima > 0" >
-              <strong>Total Larima:</strong> ${{ compra.totalLarima?.toFixed(2) }}
-            </div>
-            <button class="btn btn-secondary" @click="verDetalle(compra.id)">{{ compra.verDetalle ? 'Ocultar' : 'Ver' }}
-              Detalle</button>
           </div>
 
           <table class="table w-full table-zebra" v-if="compra.verDetalle">
